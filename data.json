@@ -1,0 +1,22 @@
+{
+  "data": {
+    "Currently Reading": {
+      "Effective Modern C++ - Scott Meyers": {
+        "range": [0, 334],
+        "value": 33
+      },
+      "Pro Git 2nd edition - Scott Chacon & Ben Straub": {
+        "range": [0, 501],
+        "value": 1
+      },
+      "Engineering a Compiler 3rd edition - Keith D. Cooper & Linda Torczon": {
+        "range": [0, 850],
+        "value": 1
+      },
+      "The Rust Programming Language 2nd edition - Steve Klabnik & Carol Nichols": {
+        "range": [0, 788],
+        "value": 1
+      }
+    }
+  }
+}
