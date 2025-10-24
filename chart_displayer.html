@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body style="height: 100%; margin: 0">
+    <div id="container" style="height: 100%"></div>
+
+    <script
+      type="text/javascript"
+      src="https://fastly.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"
+    ></script>
+
+    <script type="text/javascript">
+      function read_json_file(file, callback) {
+        let raw_file = new XMLHttpRequest();
+        raw_file.overrideMimeType("application/json");
+        raw_file.open("GET", file, true);
+        raw_file.onreadystatechange = () => {
+          if (raw_file.readyState === 4 && raw_file.status == "200") {
+            callback(raw_file.responseText);
+          }
+        };
+        raw_file.send(null);
+      }
+
+      function get_param(variable, default_value = undefined) {
+        const query = window.location.search.substring(1);
+        const vars = query.split("&");
+        for (let i = 0; i < vars.length; i++) {
+          const pair = vars[i].split("=");
+          if (pair[0] == variable) {
+            return pair[1];
+          }
+        }
+        return default_value;
+      }
+
+      read_json_file("./data.json", (text) => {
+        const data = JSON.parse(text);
+        const as_image = get_param("as_image") === "true";
+
+        const dom = document.getElementById("container");
+        let chart = echarts.init(dom, null, {
+          renderer: as_image ? "svg" : "canvas",
+          useDirtyRect: false,
+        });
+
+        let chart_data = [];
+        const data_type = get_param("data_type");
+
+        const target_data = data["data"][data_type];
+        const nb_items = Object.keys(target_data).length;
+
+        const valign_range = [-50, 50];
+        const valign_total_size = valign_range[1] - valign_range[0];
+        const valign_offset = valign_total_size / nb_items;
+
+        let item_idx = 0;
+        let formatters = [];
+        for (const item in target_data) {
+          const item_data = target_data[item];
+
+          const item_valign = valign_range[0] + item_idx * valign_offset;
+
+          const value_range_size =
+            item_data["range"][1] - item_data["range"][0];
+          const percentage =
+            (item_data["value"] - item_data["range"][0]) / value_range_size;
+
+          let progress;
+          if (item_data["range"][0] === 0) {
+            formatters.push(
+              `${item_data["value"]}/${item_data["range"][1]} (${percentage}%)`
+            );
+          }
+
+          chart_data.push({
+            value: percentage * 100,
+            name: item,
+            title: {
+              offsetCenter: ["0%", `${item_valign}%`],
+            },
+            detail: {
+              valueAnimation: true,
+              offsetCenter: ["0%", `${item_valign + 10}%`],
+              formatter: (v) =>
+                `${Math.round((v / 100) * value_range_size)}/${
+                  item_data["range"][1]
+                }`,
+            },
+          });
+          item_idx++;
+        }
+
+        const option = {
+          title: {
+            text: data_type,
+            left: "center",
+          },
+          series: [
+            {
+              type: "gauge",
+              startAngle: 90,
+              endAngle: -270,
+              pointer: {
+                show: false,
+              },
+              progress: {
+                show: true,
+                overlap: false,
+                roundCap: true,
+                clip: false,
+                itemStyle: {
+                  borderWidth: 1,
+                  borderColor: "#464646",
+                },
+              },
+              axisLine: {
+                lineStyle: {
+                  width: 40,
+                },
+              },
+              splitLine: {
+                show: false,
+                distance: 0,
+                length: 10,
+              },
+              axisTick: {
+                show: false,
+              },
+              axisLabel: {
+                show: false,
+                distance: 50,
+              },
+              data: chart_data,
+              title: {
+                fontSize: 14,
+              },
+              detail: {
+                width: "auto",
+                height: 14,
+                fontSize: 14,
+                color: "inherit",
+                borderColor: "inherit",
+                borderRadius: 20,
+                borderWidth: 1,
+              },
+            },
+          ],
+        };
+        chart.setOption(option);
+        window.addEventListener("resize", chart.resize);
+      });
+    </script>
+  </body>
+</html>
