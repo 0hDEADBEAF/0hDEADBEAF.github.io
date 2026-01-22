@@ -20,6 +20,10 @@
       "Théorie des langages - Christine Solnon": {
         "range": [0, 30],
         "value": 30
+      },
+      "Théorie des groupes - François Bergeron": {
+        "range": [0, 197],
+        "value": 14
       }
     }
   }
