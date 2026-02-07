@@ -24,6 +24,10 @@
       "Théorie des groupes - François Bergeron": {
         "range": [0, 197],
         "value": 20
+      },
+      "Professional CMake: A Practical Guide - Craig Scott": {
+        "range": [0, 1575],
+        "value": 71
       }
     }
   }
